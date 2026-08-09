@@ -1,26 +1,136 @@
 @import "tailwindcss";
 
+/* Tokens — fuente de verdad en DESIGN.md. Todos los ratios de contraste
+   están verificados contra las tres superficies (C6) y truncados, no
+   redondeados (C4). Ningún texto usa opacidad/rgba (C5). */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  --paper: #eef0f3;
+  --raised: #e0e4e9;
+  --sunken: #d5dae1;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --ink: #0e1116;
+  --ink-2: #414a55;
+  --ink-3: #505a65;
+
+  --ok: #186a3f;
+  --warn: #8a4b08;
+
+  /* texto sobre fill sólido de --ink (17,28:1) */
+  --on-ink: #f2f5f8;
+
+  --t-mono: 13px;
+  --t-body: 16px;
+  --t-lg: 20px;
+
+  --gutter: 72px;
+
+  --ease-enter: cubic-bezier(0.2, 0.8, 0.3, 1);
+  --ease-micro: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --paper: #14171c;
+    --raised: #1d222a;
+    --sunken: #262c36;
+
+    --ink: #f2f5f8;
+    --ink-2: #a9b4c0;
+    --ink-3: #8e9aa7;
+
+    --ok: #5fd79a;
+    --warn: #f0ae5e;
+
+    --on-ink: #0e1116;
   }
 }
 
+@theme inline {
+  --color-paper: var(--paper);
+  --color-raised: var(--raised);
+  --color-sunken: var(--sunken);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-ok: var(--ok);
+  --color-warn: var(--warn);
+  --color-on-ink: var(--on-ink);
+  --font-sans: var(--font-instrument-sans);
+  --font-mono: var(--font-plex-mono);
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--t-body);
+}
+
+/* Foco visible en todo interactivo (E2) — nunca outline:none sin reemplazo. */
+:where(a, button, input, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* --- Motion: cuatro vocabularios distintos, ninguno es fade+slide-up --- */
+
+/* 1. Trazo de regla: la entrada dibuja su tick de canaleta. */
+@keyframes rule-draw {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* 2. Barrido de progreso en la fila de una tool en ejecución. */
+@keyframes sweep {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* 3. Cursor de bloque a 1 Hz (E5: < 3 flashes/s). */
+@keyframes block-cursor {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.anim-rule {
+  transform-origin: top;
+  animation: rule-draw 320ms var(--ease-enter) both;
+}
+
+.anim-sweep::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, var(--sunken), transparent);
+  animation: sweep 1200ms var(--ease-micro) infinite;
+}
+
+.anim-cursor {
+  animation: block-cursor 1000ms step-end infinite;
+}
+
+/* prefers-reduced-motion anula los cuatro (E4). */
+@media (prefers-reduced-motion: reduce) {
+  .anim-rule,
+  .anim-sweep::after,
+  .anim-cursor {
+    animation: none;
+  }
+  .anim-cursor {
+    opacity: 1;
+  }
 }
