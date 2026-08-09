@@ -1,0 +1,33 @@
+# Fin de línea normalizado a LF.
+#
+# En Windows `core.autocrlf=true` convierte a CRLF al hacer checkout, así que
+# el mismo archivo aparece distinto según el sistema y salen diffs fantasma
+# donde no cambió una sola línea. Fijarlo acá gana sobre la config local de
+# cada quien: el repo queda igual en Windows, macOS y Linux.
+#
+# El repo ya está en LF, así que esto no reescribe nada: lo vuelve explícito.
+* text=auto eol=lf
+
+# Los .sh se ejecutan en Linux/macOS y con CRLF fallan con un
+# "bad interpreter" difícil de diagnosticar.
+*.sh text eol=lf
+
+# Scripts .bat y .ps1 son al revés: los quiere CRLF quien los corre.
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# Binarios: sin conversión de fin de línea ni diff de texto.
+*.ico binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+*.pdf binary
+*.onnx binary
+
+# Generado: se sigue versionando, pero no ensucia los diffs de una PR ni
+# cuenta como código propio en las estadísticas de lenguaje.
+package-lock.json linguist-generated=true diff=lockfile
