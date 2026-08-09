@@ -2,9 +2,9 @@
 
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport } from 'ai';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import type { ChatAgentUIMessage } from '@/lib/ai/agents/chatAgent';
-import { MessageBubble } from './MessageBubble';
+import { TranscriptEntry } from './TranscriptEntry';
 
 /**
  * El servidor ya manda un mensaje traducido y accionable vía `onError` (ver
@@ -41,42 +41,68 @@ function describeClientError(error: Error): string {
  * Next.js apuntando a la ruta `/api/chat` de ese proyecto (o a otra ruta
  * vía la prop `api`, si embebés esto en una app que expone el endpoint en
  * otro lado).
+ *
+ * La interfaz es un **registro de ejecución**, no un messenger: ver DESIGN.md.
  */
 export function Chat({ api = '/api/chat' }: { api?: string }) {
   const { messages, sendMessage, status, error, regenerate } = useChat<ChatAgentUIMessage>({
     transport: new DefaultChatTransport({ api }),
   });
   const [input, setInput] = useState('');
+  const inputId = useId();
 
   const isBusy = status === 'submitted' || status === 'streaming';
-  const statusLabel = status === 'submitted' ? 'Enviando...' : status === 'streaming' ? 'Respondiendo...' : null;
+  const statusLabel =
+    status === 'submitted' ? 'enviando' : status === 'streaming' ? 'respondiendo' : 'listo';
 
   return (
     <div className="flex h-full w-full flex-col">
-      <div className="flex-1 space-y-3 overflow-y-auto px-4 py-6">
-        {messages.length === 0 && (
-          <p className="mx-auto max-w-sm text-center text-sm text-zinc-400">
-            Preguntame lo que sea. Puedo calcular, decirte la fecha/hora, leer una URL, buscar en la
-            web y consultar tu base de conocimiento.
-          </p>
-        )}
+      <div className="flex-1 overflow-y-auto">
+        <div className="mx-auto w-full max-w-[1000px]">
+          {messages.length === 0 && (
+            <div className="flex">
+              <div className="w-[72px] shrink-0 px-4 py-4 text-right font-mono text-[13px] leading-[1.45] text-ink-3">
+                00
+              </div>
+              <div className="w-px shrink-0 bg-sunken" aria-hidden />
+              <p className="max-w-[64ch] py-4 pl-4 pr-6 text-[16px] leading-[1.55] text-ink-2">
+                Preguntame lo que sea. Puedo calcular, decirte la fecha/hora, leer una URL, buscar
+                en la web y consultar tu base de conocimiento. Cada tool que use queda registrada
+                acá abajo con su input y su output.
+              </p>
+            </div>
+          )}
 
-        {messages.map(message => (
-          <MessageBubble key={message.id} message={message} />
-        ))}
+          {messages.map((message, index) => (
+            <TranscriptEntry
+              key={message.id}
+              message={message}
+              index={index}
+              isStreaming={status === 'streaming' && index === messages.length - 1}
+            />
+          ))}
 
-        {error && (
-          <div className="mx-auto flex max-w-sm flex-col items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-center text-sm text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300">
-            <p>{describeClientError(error)}</p>
-            <button
-              type="button"
-              onClick={() => regenerate()}
-              className="rounded-full border border-red-300 px-3 py-1 text-xs dark:border-red-800"
-            >
-              Reintentar
-            </button>
-          </div>
-        )}
+          {error && (
+            <div className="flex">
+              <div className="w-[72px] shrink-0 px-4 py-4 text-right font-mono text-[13px] leading-[1.45] text-warn">
+                ××
+              </div>
+              <div className="w-px shrink-0 bg-warn" aria-hidden />
+              <div className="py-4 pl-4 pr-6">
+                <p className="max-w-[64ch] text-[16px] leading-[1.55] text-warn">
+                  {describeClientError(error)}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => regenerate()}
+                  className="mt-2 min-h-[24px] rounded-[3px] bg-ink px-3 py-1 font-mono text-[13px] leading-[1.45] text-on-ink"
+                >
+                  reintentar
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       <form
@@ -86,24 +112,41 @@ export function Chat({ api = '/api/chat' }: { api?: string }) {
           sendMessage({ text: input });
           setInput('');
         }}
-        className="border-t border-zinc-200 p-3 dark:border-zinc-800"
+        className="bg-raised"
       >
-        {statusLabel && <p className="mb-1.5 px-1 text-xs text-zinc-400">{statusLabel}</p>}
-        <div className="flex items-center gap-2">
-          <input
-            value={input}
-            onChange={event => setInput(event.target.value)}
-            disabled={isBusy}
-            placeholder="Escribí un mensaje..."
-            className="flex-1 rounded-full border border-zinc-300 bg-transparent px-4 py-2 text-sm outline-none focus:border-zinc-500 disabled:opacity-50 dark:border-zinc-700"
-          />
-          <button
-            type="submit"
-            disabled={isBusy || !input.trim()}
-            className="rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-50 disabled:opacity-40 dark:bg-zinc-100 dark:text-zinc-900"
+        <div className="mx-auto flex w-full max-w-[1000px] items-start">
+          {/* Label visible en la canaleta — el placeholder no alcanza como
+              etiqueta (H6/E6), y acá encaja con la estética de instrumento. */}
+          <label
+            htmlFor={inputId}
+            className="w-[72px] shrink-0 px-4 py-4 text-right font-mono text-[13px] leading-[1.45] text-ink-3"
           >
-            Enviar
-          </button>
+            msg
+          </label>
+          <div className="w-px shrink-0 self-stretch bg-sunken" aria-hidden />
+
+          <div className="flex min-w-0 flex-1 items-start gap-3 py-4 pl-4 pr-6">
+            <input
+              id={inputId}
+              value={input}
+              onChange={event => setInput(event.target.value)}
+              disabled={isBusy}
+              placeholder="Escribí un mensaje..."
+              autoComplete="off"
+              className="min-h-[24px] flex-1 rounded-[3px] bg-paper px-3 py-1.5 text-[16px] leading-[1.55] text-ink outline-none placeholder:text-ink-3 disabled:opacity-60"
+            />
+            <button
+              type="submit"
+              disabled={isBusy || !input.trim()}
+              className="min-h-[24px] rounded-[3px] bg-ink px-4 py-1.5 font-mono text-[13px] leading-[1.45] text-on-ink transition-opacity duration-150 disabled:opacity-40"
+            >
+              enviar
+            </button>
+          </div>
+        </div>
+
+        <div className="mx-auto w-full max-w-[1000px] pb-3 pl-[89px] font-mono text-[13px] leading-[1.45] text-ink-3">
+          <span aria-live="polite">{statusLabel}</span>
         </div>
       </form>
     </div>

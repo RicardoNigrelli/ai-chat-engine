@@ -1,20 +1,25 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Instrument_Sans, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Prosa, UI y controles. Ver DESIGN.md §4 — ninguna de las dos está en la
+// lista de tipografías quemadas del registro del skill.
+const instrumentSans = Instrument_Sans({
+  variable: "--font-instrument-sans",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+// Registro de maquinaria: canaleta, nombres de tool, claves, valores, scores.
+// Es funcional, no decorativo — no aparece en prosa ni en títulos.
+const plexMono = IBM_Plex_Mono({
+  variable: "--font-plex-mono",
   subsets: ["latin"],
+  weight: ["400", "500"],
 });
 
 export const metadata: Metadata = {
   title: "chat-general",
-  description: "Prototipo de asistente de chat con tools y RAG",
+  description: "Motor de chat con IA reusable: tools configurables y RAG genérico",
 };
 
 export default function RootLayout({
@@ -23,10 +28,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
+    // lang="es": el contenido es español. Estaba en "en" (regla H1).
+    <html lang="es" className={`${instrumentSans.variable} ${plexMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

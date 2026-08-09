@@ -1,5 +1,7 @@
 import { tool } from 'ai';
 import { z } from 'zod';
+import { fetch as undiciFetch } from 'undici';
+import { guardedAgent, describeBlockedCause } from '../net/safeFetch';
 
 type TavilyResult = {
   results: { title: string; url: string; content: string }[];
@@ -34,10 +36,15 @@ export const webSearchTool = tool({
     }
 
     try {
-      const response = await fetch('https://api.tavily.com/search', {
+      // El host es fijo (no lo elige el usuario), así que esto no es
+      // explotable como SSRF. Aun así pasa por `guardedAgent`: es una línea de
+      // defensa gratis contra un DNS comprometido, y deja el patrón asentado
+      // para la próxima tool que salga a internet.
+      const response = await undiciFetch('https://api.tavily.com/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         signal: AbortSignal.timeout(10_000),
+        dispatcher: guardedAgent,
         body: JSON.stringify({
           api_key: apiKey,
           query,
@@ -55,6 +62,10 @@ export const webSearchTool = tool({
         results: data.results.map(r => ({ title: r.title, url: r.url, snippet: r.content })),
       };
     } catch (error) {
+      const blocked = describeBlockedCause(error);
+      if (blocked) {
+        return { query, error: `La búsqueda se bloqueó por seguridad: ${blocked}` };
+      }
       return { query, error: `No se pudo completar la búsqueda: ${(error as Error).message}` };
     }
   },
