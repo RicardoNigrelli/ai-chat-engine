@@ -15,6 +15,18 @@ import { MessageBubble } from './MessageBubble';
  */
 function describeClientError(error: Error): string {
   const msg = error.message || '';
+
+  // Respuestas que el servidor corta ANTES de createAgentUIStreamResponse
+  // (ej. el rate limit en route.ts) le llegan al cliente como el body crudo
+  // de la respuesta, no como un mensaje ya traducido por describeAgentError.
+  // Acá se intenta extraer el campo `error` si el body es JSON.
+  try {
+    const parsed = JSON.parse(msg);
+    if (parsed && typeof parsed.error === 'string') return parsed.error;
+  } catch {
+    // No era JSON, seguimos con el resto de los casos.
+  }
+
   if (!msg || msg === 'An error occurred.') {
     return 'Ocurrió un error y el servidor no dio más detalle. Revisá los logs de `npm run dev`.';
   }
