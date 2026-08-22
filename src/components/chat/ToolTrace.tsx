@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-type GenericToolPart = {
+export type GenericToolPart = {
   type: string;
   toolCallId?: string;
   state?: string;

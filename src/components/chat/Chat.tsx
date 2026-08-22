@@ -5,6 +5,7 @@ import { DefaultChatTransport } from 'ai';
 import { useId, useState } from 'react';
 import type { ChatAgentUIMessage } from '@/lib/ai/agents/chatAgent';
 import { TranscriptEntry } from './TranscriptEntry';
+import { TracePanel } from './TracePanel';
 
 /**
  * El servidor ya manda un mensaje traducido y accionable vía `onError` (ver
@@ -56,8 +57,9 @@ export function Chat({ api = '/api/chat' }: { api?: string }) {
     status === 'submitted' ? 'enviando' : status === 'streaming' ? 'respondiendo' : 'listo';
 
   return (
-    <div className="flex h-full w-full flex-col">
-      <div className="flex-1 overflow-y-auto">
+    <div className="flex h-full min-h-0 w-full">
+      <div className="flex min-w-0 flex-[1_1_60%] flex-col border-r border-sunken">
+        <div className="flex-1 overflow-y-auto">
         <div className="mx-auto w-full max-w-[1000px]">
           {messages.length === 0 && (
             <div className="flex">
@@ -149,6 +151,11 @@ export function Chat({ api = '/api/chat' }: { api?: string }) {
           <span aria-live="polite">{statusLabel}</span>
         </div>
       </form>
+    </div>
+
+      <div className="hidden w-[360px] shrink-0 lg:block">
+        <TracePanel messages={messages} />
+      </div>
     </div>
   );
 }

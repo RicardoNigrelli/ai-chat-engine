@@ -1,13 +1,15 @@
 'use client';
 
 import type { ChatAgentUIMessage } from '@/lib/ai/agents/chatAgent';
-import { ToolTrace } from './ToolTrace';
 
 /**
  * Una entrada del registro de ejecución. No es una burbuja: es una fila de
  * traza con canaleta izquierda numerada (ver DESIGN.md §3 — el eje es la
  * densidad). El turno del usuario se distingue por **fill sólido de tinta**,
  * no por una burbuja de color alineada a la derecha.
+ *
+ * Las tool calls NO se renderizan acá — viven en el panel lateral `TracePanel`,
+ * ver Chat.tsx. Esta columna queda para el texto de la conversación.
  */
 export function TranscriptEntry({
   message,
@@ -53,19 +55,6 @@ export function TranscriptEntry({
                     <span className="anim-cursor ml-0.5 inline-block h-[1em] w-[0.5em] translate-y-[0.1em] bg-ink" />
                   )}
                 </p>
-              );
-            }
-
-            if (part.type.startsWith('tool-')) {
-              // Clave estable por llamada, no por índice: `ToolTrace` mide el
-              // tiempo con estado propio (`useState` del instante de montaje),
-              // así que si React reusa la instancia de un índice para otra
-              // parte, el cronómetro queda arrastrado de la anterior.
-              const toolCallId = (part as { toolCallId?: string }).toolCallId;
-              return (
-                <div key={toolCallId ?? partIndex} className="my-3 -ml-4 mr-2">
-                  <ToolTrace part={part as never} />
-                </div>
               );
             }
 

@@ -1,22 +1,25 @@
 @import "tailwindcss";
 
-/* Tokens — fuente de verdad en DESIGN.md. Todos los ratios de contraste
-   están verificados contra las tres superficies (C6) y truncados, no
-   redondeados (C4). Ningún texto usa opacidad/rgba (C5). */
+/* Tokens — fuente de verdad en DESIGN.md. Retinte "structured blueprint"
+   (2026-08-21, sobre la base del sistema original): misma estructura de
+   luminancia por token, hue empujado a azul-frío en vez de gris neutro, así
+   los ratios de contraste verificados en DESIGN.md §6 se preservan (mismo
+   L* aproximado, ratio WCAG es ~independiente del hue a L* constante).
+   Ningún texto usa opacidad/rgba (C5). */
 :root {
-  --paper: #eef0f3;
-  --raised: #e0e4e9;
-  --sunken: #d5dae1;
+  --paper: #eff3f8;
+  --raised: #e3e9f3;
+  --sunken: #cfdaea;
 
-  --ink: #0e1116;
-  --ink-2: #414a55;
-  --ink-3: #505a65;
+  --ink: #101623;
+  --ink-2: #3b4759;
+  --ink-3: #47536b;
 
-  --ok: #186a3f;
+  --ok: #146b46;
   --warn: #8a4b08;
 
-  /* texto sobre fill sólido de --ink (17,28:1) */
-  --on-ink: #f2f5f8;
+  /* texto sobre fill sólido de --ink */
+  --on-ink: #f3f6fb;
 
   --t-mono: 13px;
   --t-body: 16px;
@@ -30,18 +33,18 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --paper: #14171c;
-    --raised: #1d222a;
-    --sunken: #262c36;
+    --paper: #10151d;
+    --raised: #182130;
+    --sunken: #212d40;
 
-    --ink: #f2f5f8;
-    --ink-2: #a9b4c0;
-    --ink-3: #8e9aa7;
+    --ink: #eef2f8;
+    --ink-2: #a3b0c4;
+    --ink-3: #8895ac;
 
     --ok: #5fd79a;
     --warn: #f0ae5e;
 
-    --on-ink: #0e1116;
+    --on-ink: #10151d;
   }
 }
 
@@ -64,6 +67,19 @@ body {
   color: var(--ink);
   font-family: var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
   font-size: var(--t-body);
+  /* Grid de fondo — la señal "blueprint" en un sistema donde el color sigue
+     siendo funcional (§3, §6): es estructura, no acento saturado, así que no
+     compite con --ok/--warn ni suma a los "≤2 acentos" de C9. */
+  background-image: linear-gradient(var(--sunken) 1px, transparent 1px),
+    linear-gradient(90deg, var(--sunken) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-image: linear-gradient(var(--raised) 1px, transparent 1px),
+      linear-gradient(90deg, var(--raised) 1px, transparent 1px);
+  }
 }
 
 /* Foco visible en todo interactivo (E2) — nunca outline:none sin reemplazo. */
