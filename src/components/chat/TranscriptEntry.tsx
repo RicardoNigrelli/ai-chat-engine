@@ -1,5 +1,6 @@
 'use client';
 
+import ReactMarkdown from 'react-markdown';
 import type { ChatAgentUIMessage } from '@/lib/ai/agents/chatAgent';
 
 /**
@@ -24,19 +25,19 @@ export function TranscriptEntry({
   const step = String(index + 1).padStart(2, '0');
 
   return (
-    <article className={isUser ? 'bg-ink text-on-ink' : ''}>
+    <article className={isUser ? 'bg-user-fill text-user-text' : ''}>
       <div className="flex">
         {/* Canaleta: numeración del paso y rol. Ancho fijo de 72px. */}
         <div className="w-[72px] shrink-0 select-none px-4 py-4 text-right font-mono text-[13px] leading-[1.45]">
-          <div className={isUser ? 'text-on-ink' : 'text-ink-3'}>{step}</div>
-          <div className={`mt-1 ${isUser ? 'text-on-ink' : 'text-ink-3'}`}>
+          <div className={isUser ? 'text-user-text' : 'text-ink-3'}>{step}</div>
+          <div className={`mt-1 ${isUser ? 'text-user-text' : 'text-ink-3'}`}>
             {isUser ? 'tú' : 'ia'}
           </div>
         </div>
 
         {/* Tick de canaleta — se dibuja al entrar (motion #1). */}
         <div
-          className={`anim-rule w-px shrink-0 ${isUser ? 'bg-on-ink' : 'bg-sunken'}`}
+          className={`anim-rule w-px shrink-0 ${isUser ? 'bg-user-text' : 'bg-sunken'}`}
           aria-hidden
         />
 
@@ -45,16 +46,16 @@ export function TranscriptEntry({
             if (part.type === 'text') {
               const isLast = partIndex === message.parts.length - 1;
               return (
-                <p
+                <div
                   key={partIndex}
-                  className="max-w-[64ch] whitespace-pre-wrap text-[16px] leading-[1.55]"
+                  className="max-w-[64ch] text-[16px] leading-[1.55] [&>*+*]:mt-3 [&_p]:whitespace-pre-wrap [&_strong]:font-semibold [&_em]:italic [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li+li]:mt-1 [&_h1]:text-[16px] [&_h1]:font-semibold [&_h2]:text-[16px] [&_h2]:font-semibold [&_h3]:text-[16px] [&_h3]:font-semibold [&_code]:rounded-[3px] [&_code]:bg-sunken [&_code]:px-1 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[13px] [&_pre]:rounded-[3px] [&_pre]:bg-sunken [&_pre]:p-3 [&_pre]:font-mono [&_pre]:text-[13px] [&_pre]:leading-[1.45] [&_pre]:overflow-x-auto [&_a]:underline [&_a]:underline-offset-2"
                 >
-                  {part.text}
+                  <ReactMarkdown>{part.text}</ReactMarkdown>
                   {/* Cursor de bloque durante el streaming (motion #3). */}
                   {isStreaming && isLast && (
                     <span className="anim-cursor ml-0.5 inline-block h-[1em] w-[0.5em] translate-y-[0.1em] bg-ink" />
                   )}
-                </p>
+                </div>
               );
             }
 

@@ -6,6 +6,7 @@ import { useId, useState } from 'react';
 import type { ChatAgentUIMessage } from '@/lib/ai/agents/chatAgent';
 import { TranscriptEntry } from './TranscriptEntry';
 import { TracePanel } from './TracePanel';
+import { ThinkingIndicator } from './ThinkingIndicator';
 
 /**
  * El servidor ya manda un mensaje traducido y accionable vía `onError` (ver
@@ -53,8 +54,6 @@ export function Chat({ api = '/api/chat' }: { api?: string }) {
   const inputId = useId();
 
   const isBusy = status === 'submitted' || status === 'streaming';
-  const statusLabel =
-    status === 'submitted' ? 'enviando' : status === 'streaming' ? 'respondiendo' : 'listo';
 
   return (
     <div className="flex h-full min-h-0 w-full">
@@ -148,7 +147,9 @@ export function Chat({ api = '/api/chat' }: { api?: string }) {
         </div>
 
         <div className="mx-auto w-full max-w-[1000px] pb-3 pl-[89px] font-mono text-[13px] leading-[1.45] text-ink-3">
-          <span aria-live="polite">{statusLabel}</span>
+          <span aria-live="polite">
+            {isBusy ? <ThinkingIndicator status={status as 'submitted' | 'streaming'} /> : 'listo'}
+          </span>
         </div>
       </form>
     </div>
