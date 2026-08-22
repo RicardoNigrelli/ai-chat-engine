@@ -7,6 +7,8 @@ import type { ChatAgentUIMessage } from '@/lib/ai/agents/chatAgent';
 import { TranscriptEntry } from './TranscriptEntry';
 import { TracePanel } from './TracePanel';
 import { ThinkingIndicator } from './ThinkingIndicator';
+import { KnowledgeUpload } from './KnowledgeUpload';
+import { useSessionId } from '@/hooks/useSessionId';
 
 /**
  * El servidor ya manda un mensaje traducido y accionable vía `onError` (ver
@@ -47,8 +49,9 @@ function describeClientError(error: Error): string {
  * La interfaz es un **registro de ejecución**, no un messenger: ver DESIGN.md.
  */
 export function Chat({ api = '/api/chat' }: { api?: string }) {
+  const sessionId = useSessionId();
   const { messages, sendMessage, status, error, regenerate } = useChat<ChatAgentUIMessage>({
-    transport: new DefaultChatTransport({ api }),
+    transport: new DefaultChatTransport({ api, headers: { 'x-session-id': sessionId } }),
   });
   const [input, setInput] = useState('');
   const inputId = useId();
@@ -144,6 +147,10 @@ export function Chat({ api = '/api/chat' }: { api?: string }) {
               enviar
             </button>
           </div>
+        </div>
+
+        <div className="mx-auto w-full max-w-[1000px] pb-3 pl-[89px] pr-6">
+          <KnowledgeUpload sessionId={sessionId} />
         </div>
 
         <div className="mx-auto w-full max-w-[1000px] pb-3 pl-[89px] font-mono text-[13px] leading-[1.45] text-ink-3">
