@@ -205,3 +205,61 @@ body {
     opacity: 1;
   }
 }
+
+/* Tour de onboarding (driver.js) — mismos tokens que el resto, radios
+   chicos (§8), sin sombras difusas ni gradientes que rompan el sistema. */
+.chat-general-tour.driver-popover {
+  background: var(--raised);
+  color: var(--ink);
+  border: 1px solid var(--sunken);
+  border-radius: 3px;
+  box-shadow: none;
+  font-family: var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
+  padding: 16px;
+}
+
+.chat-general-tour .driver-popover-title {
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.chat-general-tour .driver-popover-description {
+  color: var(--ink-2);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.chat-general-tour .driver-popover-progress-text {
+  font-family: var(--font-plex-mono), ui-monospace, monospace;
+  color: var(--ink-3);
+  font-size: 12px;
+}
+
+.chat-general-tour .driver-popover-navigation-btns button {
+  font-family: var(--font-plex-mono), ui-monospace, monospace;
+  font-size: 12px;
+  background: var(--ink);
+  color: var(--on-ink);
+  border: none;
+  border-radius: 3px;
+  text-shadow: none;
+  padding: 6px 12px;
+}
+
+.chat-general-tour .driver-popover-close-btn {
+  color: var(--ink-3);
+}
+
+.chat-general-tour .driver-popover-arrow-side-left.driver-popover-arrow {
+  border-left-color: var(--raised);
+}
+.chat-general-tour .driver-popover-arrow-side-right.driver-popover-arrow {
+  border-right-color: var(--raised);
+}
+.chat-general-tour .driver-popover-arrow-side-top.driver-popover-arrow {
+  border-top-color: var(--raised);
+}
+.chat-general-tour .driver-popover-arrow-side-bottom.driver-popover-arrow {
+  border-bottom-color: var(--raised);
+}

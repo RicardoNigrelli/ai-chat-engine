@@ -129,7 +129,7 @@ export function Chat({ api = '/api/chat' }: { api?: string }) {
           </label>
           <div className="w-px shrink-0 self-stretch bg-sunken" aria-hidden />
 
-          <div className="flex min-w-0 flex-1 items-start gap-3 py-4 pl-4 pr-6">
+          <div id="tour-input" className="flex min-w-0 flex-1 items-start gap-3 py-4 pl-4 pr-6">
             <input
               id={inputId}
               value={input}
@@ -149,7 +149,7 @@ export function Chat({ api = '/api/chat' }: { api?: string }) {
           </div>
         </div>
 
-        <div className="mx-auto w-full max-w-[1000px] pb-3 pl-[89px] pr-6">
+        <div id="tour-knowledge" className="mx-auto w-full max-w-[1000px] pb-3 pl-[89px] pr-6">
           <KnowledgeUpload sessionId={sessionId} />
         </div>
 
@@ -161,7 +161,7 @@ export function Chat({ api = '/api/chat' }: { api?: string }) {
       </form>
     </div>
 
-      <div className="hidden w-[360px] shrink-0 lg:block">
+      <div id="tour-trace" className="hidden w-[360px] shrink-0 lg:block">
         <TracePanel messages={messages} />
       </div>
     </div>

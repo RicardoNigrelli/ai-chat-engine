@@ -1,4 +1,5 @@
 import { Chat } from '@/components/chat';
+import { TourButton } from '@/components/chat/TourButton';
 
 export default function Home() {
   return (
@@ -11,11 +12,12 @@ export default function Home() {
           <span className="w-[72px] shrink-0 px-4 py-4 text-right font-mono text-[13px] leading-[1.45] text-ink-3">
             {'///'}
           </span>
-          <div className="flex min-w-0 flex-1 items-baseline gap-4 py-4 pl-4 pr-6">
+          <div id="tour-header" className="flex min-w-0 flex-1 items-baseline gap-4 py-4 pl-4 pr-6">
             <h1 className="text-[20px] font-medium leading-[1.2] text-ink">chat-general</h1>
             <p className="font-mono text-[13px] leading-[1.45] text-ink-3">
               motor de chat · tools + RAG
             </p>
+            <TourButton className="ml-auto" />
           </div>
         </div>
       </header>
