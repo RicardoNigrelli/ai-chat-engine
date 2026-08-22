@@ -12,6 +12,12 @@ import {
 import { checkUploadRateLimit } from '@/lib/ai/rateLimit';
 import type { DocumentChunk } from '@/lib/ai/rag/types';
 
+// El primer request a una instancia fría descarga el modelo de embeddings
+// (~470MB) — sin esto el límite por defecto corta la función antes de que
+// termine. Mismo valor que /api/chat/route.ts, que tiene el mismo costo de
+// cold start por la misma tool.
+export const maxDuration = 60;
+
 /**
  * Sube un documento de texto a la base de conocimiento de ESTA sesión (ver
  * rag/sessionStore.ts — no es global, no se comparte entre visitantes).
