@@ -1,3 +1,5 @@
+import os from 'node:os';
+import path from 'node:path';
 import type { FeatureExtractionPipeline } from '@huggingface/transformers';
 
 /**
@@ -17,7 +19,15 @@ let extractorPromise: Promise<FeatureExtractionPipeline> | undefined;
 
 async function getExtractor(): Promise<FeatureExtractionPipeline> {
   if (!extractorPromise) {
-    extractorPromise = import('@huggingface/transformers').then(({ pipeline }) => {
+    extractorPromise = import('@huggingface/transformers').then(({ pipeline, env }) => {
+      // Por defecto transformers.js cachea el modelo descargado adentro de
+      // node_modules/ — de solo lectura en una función serverless de Vercel
+      // ("ENOENT: no such file or directory, mkdir '.../node_modules/
+      // @huggingface/transformers/.cache'", confirmado en producción). El
+      // único directorio escribible ahí es el temporal del SO — `os.tmpdir()`
+      // resuelve bien tanto en Vercel (/tmp) como en dev local (Windows/Mac/
+      // Linux), así que sirve para los dos casos sin ramificar por entorno.
+      env.cacheDir = path.join(os.tmpdir(), 'chat-general-transformers-cache');
       console.log(`[localEmbeddings] Cargando modelo ${MODEL_ID} (primera vez puede tardar, se descarga y cachea)...`);
       return pipeline('feature-extraction', MODEL_ID);
     });
